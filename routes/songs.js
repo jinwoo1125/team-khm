@@ -4,6 +4,7 @@ const { upload, getSongs, getSong, streamSong, deleteSong, getMySongs, recordStr
 const { getComments, addComment, deleteComment } = require('../controllers/commentController');
 const { toggle: likeToggle, getStatus: likeStatus } = require('../controllers/likeController');
 const { saveSong, unsaveSong } = require('../controllers/saveController');
+const { rateSong, getRating } = require('../controllers/ratingController');
 const { authRequired, authOptional } = require('../middleware/auth');
 const { multiUpload } = require('../utils/upload');
 
@@ -27,6 +28,10 @@ router.get('/:id/like', authRequired, likeStatus);
 // 저장
 router.post('/:id/save', authRequired, saveSong);
 router.delete('/:id/save', authRequired, unsaveSong);
+
+// 별점
+router.post('/:id/rating', authRequired, rateSong);
+router.get('/:id/rating', authOptional, getRating);
 
 // 댓글
 router.get('/:id/comments', getComments);

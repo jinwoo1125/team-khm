@@ -15,7 +15,7 @@ function getDateFilter(period) {
     case 'weekly':  return "p.played_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
     case 'monthly': return "p.played_at >= DATE_SUB(NOW(), INTERVAL 1 MONTH)";
     case 'yearly':  return "p.played_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)";
-    default:        return "1=1";
+    default:        return "p.played_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)";
   }
 }
 
@@ -46,7 +46,7 @@ async function getChart(req, res) {
       params
     );
 
-    res.json({ period, rows });
+    res.json(rows);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: '서버 오류가 발생했습니다.' });
