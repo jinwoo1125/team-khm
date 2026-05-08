@@ -5,7 +5,8 @@ const CHART_FIELDS = `
   u.nickname AS uploader,
   g.name AS genre,
   COUNT(DISTINCT l.id) AS like_count,
-  (s.play_count + COUNT(DISTINCT l.id) * 2 + COUNT(DISTINCT sv.id) * 3) AS score
+  COUNT(DISTINCT sv.id) AS save_count,
+  (COUNT(DISTINCT p.id) + COUNT(DISTINCT l.id) * 2 + COUNT(DISTINCT sv.id) * 3) AS score
 `;
 
 function getDateFilter(period) {

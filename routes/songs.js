@@ -5,12 +5,7 @@ const { getComments, addComment, deleteComment } = require('../controllers/comme
 const { toggle: likeToggle, getStatus: likeStatus } = require('../controllers/likeController');
 const { saveSong, unsaveSong } = require('../controllers/saveController');
 const { authRequired, authOptional } = require('../middleware/auth');
-const { songUpload, coverUpload } = require('../utils/upload');
-
-const multiUpload = (req, res, next) => {
-  const fields = [{ name: 'song', maxCount: 1 }, { name: 'cover', maxCount: 1 }];
-  require('../utils/upload').songUpload.fields(fields)(req, res, next);
-};
+const { multiUpload } = require('../utils/upload');
 
 // 음원 목록 / 업로드
 router.get('/', getSongs);
