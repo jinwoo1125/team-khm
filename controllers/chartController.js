@@ -11,14 +11,11 @@ const CHART_FIELDS = `
 
 function getDateFilter(period) {
   switch (period) {
-    case 'daily':
-      return "p.played_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)";
-    case 'monthly':
-      return "p.played_at >= DATE_SUB(NOW(), INTERVAL 1 MONTH)";
-    case 'yearly':
-      return "p.played_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)";
-    default:
-      return "1=1";
+    case 'daily':   return "p.played_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)";
+    case 'weekly':  return "p.played_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
+    case 'monthly': return "p.played_at >= DATE_SUB(NOW(), INTERVAL 1 MONTH)";
+    case 'yearly':  return "p.played_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)";
+    default:        return "1=1";
   }
 }
 

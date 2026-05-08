@@ -26,6 +26,7 @@ app.use('/api/charts', require('./routes/charts'));
 app.use('/api/genres', require('./routes/genres'));
 app.use('/api/recommend', require('./routes/recommend'));
 app.use('/api/saves', require('./routes/saves'));
+app.use('/api/withdraw', require('./routes/withdraw'));
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 

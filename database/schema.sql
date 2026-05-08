@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS users (
   email VARCHAR(100) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
   nickname VARCHAR(50) NOT NULL UNIQUE,
+  avatar_index INT DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -76,4 +77,16 @@ CREATE TABLE IF NOT EXISTS plays (
   song_id INT NOT NULL,
   played_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (song_id) REFERENCES songs(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS withdrawals (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  bank_name VARCHAR(50) NOT NULL,
+  account_number VARCHAR(50) NOT NULL,
+  phone VARCHAR(20) NOT NULL,
+  amount BIGINT NOT NULL,
+  status ENUM('pending', 'completed', 'rejected') DEFAULT 'pending',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

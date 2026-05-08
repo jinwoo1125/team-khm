@@ -131,4 +131,40 @@ async function updateGenres(req, res) {
   }
 }
 
-module.exports = { register, login, me, updateGenres };
+async function updateMe(req, res) {
+  const { nickname, avatar_index } = req.body;
+  if (!nickname && avatar_index === undefined) {
+    return res.status(400).json({ message: '수정할 정보를 입력해주세요.' });
+  }
+
+  try {
+    if (nickname) {
+      const [dup] = await db.query(
+        'SELECT id FROM users WHERE nickname = ? AND id != ?',
+        [nickname, req.user.id]
+      );
+      if (dup.length > 0) {
+        return res.status(409).json({ message: '이미 사용 중인 닉네임입니다.' });
+      }
+    }
+
+    const fields = [];
+    const values = [];
+    if (nickname) { fields.push('nickname = ?'); values.push(nickname); }
+    if (avatar_index !== undefined) { fields.push('avatar_index = ?'); values.push(avatar_index); }
+    values.push(req.user.id);
+
+    await db.query(`UPDATE users SET ${fields.join(', ')} WHERE id = ?`, values);
+
+    const [rows] = await db.query(
+      'SELECT id, email, nickname, avatar_index, created_at FROM users WHERE id = ?',
+      [req.user.id]
+    );
+    res.json(rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+  }
+}
+
+module.exports = { register, login, me, updateMe, updateGenres };

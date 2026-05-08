@@ -151,4 +151,54 @@ async function deleteSong(req, res) {
   }
 }
 
-module.exports = { upload, getSongs, getSong, streamSong, deleteSong };
+async function getMySongs(req, res) {
+  try {
+    const [rows] = await db.query(
+      `SELECT s.id, s.title, s.cover_path, s.play_count, s.created_at,
+              g.name AS genre,
+              COUNT(DISTINCT l.id) AS like_count,
+              COUNT(DISTINCT c.id) AS comment_count
+       FROM songs s
+       LEFT JOIN genres g ON s.genre_id = g.id
+       LEFT JOIN likes l ON s.id = l.song_id
+       LEFT JOIN comments c ON s.id = c.song_id
+       WHERE s.user_id = ?
+       GROUP BY s.id
+       ORDER BY s.created_at DESC`,
+      [req.user.id]
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+  }
+}
+
+async function recordStream(req, res) {
+  const songId = req.params.id;
+  const userId = req.user?.id ?? null;
+
+  try {
+    const [songRows] = await db.query('SELECT id FROM songs WHERE id = ?', [songId]);
+    if (songRows.length === 0) return res.status(404).json({ message: '음원을 찾을 수 없습니다.' });
+
+    await db.query('INSERT INTO plays (user_id, song_id) VALUES (?, ?)', [userId, songId]);
+    await db.query('UPDATE songs SET play_count = play_count + 1 WHERE id = ?', [songId]);
+
+    const [[{ total }]] = await db.query(
+      'SELECT play_count AS total FROM songs WHERE id = ?',
+      [songId]
+    );
+    const [[{ daily }]] = await db.query(
+      'SELECT COUNT(*) AS daily FROM plays WHERE song_id = ? AND played_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)',
+      [songId]
+    );
+
+    res.json({ total_streams: total, daily_streams: daily });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+  }
+}
+
+module.exports = { upload, getSongs, getSong, streamSong, deleteSong, getMySongs, recordStream };
